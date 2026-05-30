@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- SEO -->
+  <title>Design Wiki — System Design Interview Study Guide</title>
+  <meta name="description"
+    content="A comprehensive, interactive wiki for mastering system design interviews. Study load balancing, caching, microservices, databases, and more with structured, concise guides." />
+  <meta name="keywords"
+    content="system design, interview prep, distributed systems, load balancing, caching, microservices" />
+  <meta property="og:title" content="Design Wiki — System Design Interview Study Guide" />
+  <meta property="og:description" content="Interactive wiki for system design interview preparation." />
+  <meta property="og:type" content="website" />
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <!-- ════════════ HEADER ════════════ -->
+    <header class="app-header" role="banner">
+      <div class="header-inner">
+        <a class="logo" href="#" aria-label="Design Wiki Home">
+          <div class="logo-icon" aria-hidden="true">🧠</div>
+          <span class="logo-text">Design<span>Wiki</span></span>
+        </a>
+        <div class="header-right">
+          <div class="stats-badge" aria-live="polite">
+            <span aria-hidden="true">📚</span>
+            <span id="topic-count">—</span> Topics
+          </div>
+          <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">🌙</button>
+        </div>
+      </div>
+    </header>
+    <!-- ════════════ MAIN ════════════ -->
+    <main class="main-content" role="main">
+      <!-- LIST VIEW -->
+      <div id="list-view" class="list-view" aria-label="Topic list">
+        <!-- Hero -->
+        <div class="page-hero">
+          <h1>System Design Wiki</h1>
+          <p>Master scalable systems — structured guides for every interview topic.</p>
+        </div>
+        <!-- Search & Filters -->
+        <div class="search-filters">
+          <div class="search-wrapper">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="search" id="search-input" class="search-input" placeholder="Search topics, tags…"
+              aria-label="Search topics" autocomplete="off" />
+          </div>
+          <div class="filter-row" id="filter-row" role="group" aria-label="Category filters">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        <!-- Results bar -->
+        <div class="results-bar" aria-live="polite">
+          <span class="results-count" id="results-count">Loading…</span>
+        </div>
+        <!-- Topic Grid -->
+        <div id="topic-grid" class="topic-grid" role="list" aria-label="System design topics">
+          <!-- Cards inserted by JS -->
+        </div>
+      </div><!-- /list-view -->
+      <!-- DETAIL VIEW -->
+      <div id="detail-view" class="detail-view" role="article" aria-label="Topic detail" aria-live="polite">
+        <!-- Back + Bookmark row -->
+        <div class="detail-back-row">
+          <button id="detail-back" class="back-btn" aria-label="Back to topic list">
+            ← Back to topics
+          </button>
+          <button id="detail-bookmark" class="detail-bookmark-btn" aria-label="Bookmark this topic">☆</button>
+        </div>
+        <!-- Detail Hero -->
+        <div class="detail-hero">
+          <div id="detail-category" class="detail-category-tag"></div>
+          <h1 id="detail-title" class="detail-title"></h1>
+          <div id="detail-meta" class="detail-meta"></div>
+          <div id="detail-tags" class="detail-tags"></div>
+        </div>
+        <!-- Detail Sections (overview, keypoints, concepts, tools, tradeoffs, tips) -->
+        <div id="detail-sections" class="detail-sections">
+          <!-- Populated by JS -->
+        </div>
+      </div><!-- /detail-view -->
+    </main>
+    <!-- ════════════ FOOTER ════════════ -->
+    <footer class="app-footer" role="contentinfo">
+      Data sourced from
+      <a href="https://github.com/abhicodbase/design-wiki" target="_blank"
+        rel="noopener noreferrer">abhicodbase/design-wiki</a>
+      · Built with vanilla HTML, CSS &amp; JS
+    </footer>
+  </div><!-- /app-shell -->
+  <script src="app.js" defer></script>
+</body>
+
+</html>
