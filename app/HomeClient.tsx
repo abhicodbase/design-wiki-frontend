@@ -1,16 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Topic } from "@/lib/topics";
 import styles from "./Home.module.css";
 
-export default function HomeClient({ initialTopics }: { initialTopics: Topic[] }) {
+function HomeClientContent({ initialTopics }: { initialTopics: Topic[] }) {
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  
+  // Read category from URL query parameters
+  const selectedCategory = searchParams.get("topic") || "All Topics";
 
-  // Extract all unique categories
-  const categories = ["All", ...Array.from(new Set(initialTopics.map((t) => t.category)))];
+  // Unique categories derived from data
+  const categories = ["All Topics", ...Array.from(new Set(initialTopics.map((t) => t.category)))];
 
   // Filtering logic
   const filteredTopics = initialTopics.filter((topic) => {
@@ -19,7 +23,8 @@ export default function HomeClient({ initialTopics }: { initialTopics: Topic[] }
       topic.overview.toLowerCase().includes(searchQuery.toLowerCase()) ||
       topic.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const matchesCategory = selectedCategory === "All" || topic.category === selectedCategory;
+    const matchesCategory =
+      selectedCategory === "All Topics" || topic.category.toLowerCase() === selectedCategory.toLowerCase();
 
     return matchesSearch && matchesCategory;
   });
@@ -33,17 +38,6 @@ export default function HomeClient({ initialTopics }: { initialTopics: Topic[] }
 
   return (
     <div className={styles.container}>
-      {/* Masthead */}
-      <header className={styles.masthead}>
-        <div className={styles.mastheadSubtitle}>Distributed Systems & Scalable Architectures</div>
-        <h1 className={styles.mastheadTitle}>System Design Wiki</h1>
-        <div className={styles.mastheadMeta}>
-          <span>Vol. I • No. 1</span>
-          <span className={styles.metaItemCenter}>A Minimalist Handbook for Engineers</span>
-          <span>{new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" })}</span>
-        </div>
-      </header>
-
       {/* Controls Section */}
       <section className={styles.controlsSection}>
         <div className={styles.searchWrapper}>
@@ -58,15 +52,15 @@ export default function HomeClient({ initialTopics }: { initialTopics: Topic[] }
 
         <div className={styles.filterGroup}>
           {categories.map((category) => (
-            <button
+            <Link
               key={category}
+              href={category === "All Topics" ? "/" : `/?topic=${category}`}
               className={`${styles.filterBtn} ${
                 selectedCategory === category ? styles.activeFilterBtn : ""
               }`}
-              onClick={() => setSelectedCategory(category)}
             >
               {category}
-            </button>
+            </Link>
           ))}
         </div>
       </section>
@@ -142,5 +136,13 @@ export default function HomeClient({ initialTopics }: { initialTopics: Topic[] }
         )}
       </main>
     </div>
+  );
+}
+
+export default function HomeClient({ initialTopics }: { initialTopics: Topic[] }) {
+  return (
+    <Suspense fallback={<div className={styles.loadingWrapper}><div className={styles.spinner} /></div>}>
+      <HomeClientContent initialTopics={initialTopics} />
+    </Suspense>
   );
 }
