@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Inter, Geist_Mono, UnifrakturMaguntia } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { fetchTopics } from "@/lib/topics";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -26,20 +27,33 @@ const unifraktur = UnifrakturMaguntia({
 
 export const metadata: Metadata = {
   title: "System Design Wiki - The Design Times",
-  description: "A minimalist, newspaper-grade handbook for distributed systems, scalable architectures, and system design interviews.",
-  keywords: ["system design", "distributed systems", "software architecture", "scalability", "interviews", "tech handbook"],
+  description:
+    "A minimalist, newspaper-grade handbook for distributed systems, scalable architectures, and system design interviews.",
+  keywords: [
+    "system design",
+    "distributed systems",
+    "software architecture",
+    "scalability",
+    "interviews",
+    "tech handbook",
+  ],
   authors: [{ name: "Design Wiki Team" }],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const topics = await fetchTopics();
+
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable} ${geistMono.variable} ${unifraktur.variable}`}>
+    <html
+      lang="en"
+      className={`${playfair.variable} ${inter.variable} ${geistMono.variable} ${unifraktur.variable}`}
+    >
       <body>
-        <Navbar />
+        <Navbar topics={topics} />
         {children}
       </body>
     </html>
