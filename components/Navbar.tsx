@@ -59,11 +59,15 @@ function NavbarContent({ topics = [] }: NavbarProps) {
     ? Math.ceil((pendingCount + inProgressCount) / 3)
     : 0;
 
+  const dynamicCategories = Array.from(new Set(topics.map((t) => t.category))).slice(0, 3);
+  
   const navTabs = [
     { id: "topics", label: "ALL TOPICS" },
-    { id: "architecture", label: "ARCHITECTURE" },
-    { id: "databases", label: "DATABASES" },
-    { id: "networking", label: "NETWORKING" },
+    ...dynamicCategories.map(cat => ({
+      id: cat.toLowerCase(),
+      label: cat.toUpperCase(),
+      originalCategory: cat
+    })),
     { id: "practice", label: "PRACTICE" },
     { id: "review", label: "REVIEW QUEUE" },
   ];
@@ -192,12 +196,12 @@ function NavbarContent({ topics = [] }: NavbarProps) {
       {/* ── Navigation Tab Strip ── */}
       <nav className={styles.navStrip} aria-label="Main navigation">
         {navTabs.map((tab) => {
-          const isTopicFilter = ["architecture", "databases", "networking"].includes(tab.id);
+          const isTopicFilter = 'originalCategory' in tab;
           const href = isTopicFilter
-            ? `/?tab=topics&topic=${tab.id.charAt(0).toUpperCase() + tab.id.slice(1)}`
+            ? `/?tab=topics&topic=${encodeURIComponent((tab as any).originalCategory)}`
             : `/?tab=${tab.id}`;
           const isActive = isTopicFilter
-            ? currentTopic.toLowerCase() === tab.id
+            ? currentTopic === (tab as any).originalCategory
             : currentTab === tab.id;
 
           return (

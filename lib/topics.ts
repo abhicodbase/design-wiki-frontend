@@ -290,17 +290,35 @@ export async function fetchTopics(): Promise<Topic[]> {
       const path = await import("path");
       const topicsPath = path.join(localRepo, "topics");
       if (fs.existsSync(topicsPath)) {
-        const files = fs.readdirSync(topicsPath);
-        const list: Topic[] = [];
-        for (const file of files) {
-          const dirPath = path.join(topicsPath, file);
-          const stat = fs.statSync(dirPath);
-          if (stat.isDirectory()) {
-            const topicMdPath = path.join(dirPath, "topic.md");
-            if (fs.existsSync(topicMdPath)) {
-              const content = fs.readFileSync(topicMdPath, "utf-8");
-              list.push(parseMarkdownTopic(content));
+        function getTopicFiles(dir: string, fileList: string[]) {
+          const files = fs.readdirSync(dir, { withFileTypes: true });
+          for (const file of files) {
+            const fullPath = path.join(dir, file.name);
+            if (file.isDirectory()) {
+              getTopicFiles(fullPath, fileList);
+            } else if (file.name === "topic.md") {
+              fileList.push(fullPath);
             }
+          }
+        }
+        
+        const topicPaths: string[] = [];
+        getTopicFiles(topicsPath, topicPaths);
+        
+        const list: Topic[] = [];
+        for (const topicMdPath of topicPaths) {
+          try {
+            const content = fs.readFileSync(topicMdPath, "utf-8");
+            const topic = parseMarkdownTopic(content);
+            const relPath = path.relative(topicsPath, topicMdPath);
+            const parts = relPath.split(path.sep);
+            if (parts.length >= 3) {
+              const chapter = parts[0];
+              topic.category = chapter.replace(/^\d+-/, '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            }
+            list.push(topic);
+          } catch (e) {
+            console.error(`Error reading ${topicMdPath}:`, e);
           }
         }
         return list;
@@ -355,10 +373,37 @@ export async function fetchTopicDetails(id: string): Promise<Topic | null> {
     try {
       const fs = await import("fs");
       const path = await import("path");
-      const filePath = path.join(localRepo, "topics", id, "topic.md");
-      if (fs.existsSync(filePath)) {
-        const content = fs.readFileSync(filePath, "utf-8");
-        return parseMarkdownTopic(content);
+      const topicsPath = path.join(localRepo, "topics");
+      let foundPath: string | null = null;
+      
+      function findTopicDir(dir: string) {
+        if (foundPath) return;
+        const files = fs.readdirSync(dir, { withFileTypes: true });
+        for (const file of files) {
+          if (file.isDirectory()) {
+            if (file.name === id) {
+              foundPath = path.join(dir, file.name, "topic.md");
+              return;
+            }
+            findTopicDir(path.join(dir, file.name));
+          }
+        }
+      }
+      
+      if (fs.existsSync(topicsPath)) {
+        findTopicDir(topicsPath);
+      }
+      
+      if (foundPath && fs.existsSync(foundPath)) {
+        const content = fs.readFileSync(foundPath, "utf-8");
+        const topic = parseMarkdownTopic(content);
+        const relPath = path.relative(topicsPath, foundPath);
+        const parts = relPath.split(path.sep);
+        if (parts.length >= 3) {
+          const chapter = parts[0];
+          topic.category = chapter.replace(/^\d+-/, '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+        return topic;
       }
     } catch (e) {
       console.error(`Failed to read topic details for ${id} locally`, e);
