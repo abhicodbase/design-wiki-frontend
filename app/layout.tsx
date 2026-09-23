@@ -40,6 +40,10 @@ export const metadata: Metadata = {
   authors: [{ name: "Design Wiki Team" }],
 };
 
+// Force dynamic rendering so fetchTopics() always reads from the local filesystem
+// instead of being cached/prerendered at build time (when the local repo may not be accessible).
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
